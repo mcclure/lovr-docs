@@ -4,6 +4,12 @@ local shader = require 'shader'
 
 local DEBUG_backBumper = false -- Set this to "true" and the ball will bounce back instead of dying
 
+-- Configure spatializer test
+local spaceSize = 16
+local audioMaterial = "concrete" -- Options include "carpet" "concrete" "glass"
+local geometryMode = "mesh" -- Options "disable" "box" "mesh". "box" is oculus-audio-only
+local volume = 1
+
 -- Oculus Go uses a fixed camera position, so we have to change where things are drawn
 local fixedCamera = lovr.headset.getName() == "Oculus Go"
 
@@ -125,6 +131,7 @@ local audioGeometryMesh
 
 function lovr.load()
 	print("Spatializer", lovr.audio.getSpatializer())
+	print("Material", audioMaterial, "Geometry", geometryMode, "Source-volume", volume)
 
 	lovr.graphics.setBackgroundColor(.1, .1, .1)
 	lovr.headset.setClipDistance(0.1, 3000)
@@ -136,8 +143,8 @@ function lovr.load()
 		--lovr.audio.setGeometry({}, {})
 		--lovr.audio.setGeometry({0,0,0, 0,1,0, 1,0,0}, {1,2,3}) -- Alternate
 		-- Create audio geometry and visible form of a cube
-		multiply(rectangle[1], 8)
-		lovr.audio.setGeometry(unpack(rectangle))
+		multiply(rectangle[1], spaceSize)
+		--lovr.audio.setGeometry(rectangle[1], rectangle[2], audioMaterial, geometryMode)
 		
 		audioGeometryMesh =  lovr.graphics.newMesh(rectangle[1], 'triangles', 'dynamic', true)
   		audioGeometryMesh:setVertexMap(rectangle[2])
@@ -152,12 +159,14 @@ function lovr.load()
 			-- Add effects that make spatialization possible
 			for _,effect in ipairs{"absorption","attenuation","occlusion","reverb","spatialization","transmission"} do
 				source:setEffectEnabled(effect, true)
+				source:setVolume(volume)
 			end
 		end
 
 		-- "Game system" sound effects are not spatialized
 		sounds.fail = lovr.audio.newSource("break-buzzer.ogg", {spatial=false})
 		sounds.restart = lovr.audio.newSource("break-countdown.ogg", {spatial=false})
+		sounds.fail:setVolume(volume)   sounds.restart:setVolume(volume)
 	end
 end
 
