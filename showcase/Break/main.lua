@@ -147,7 +147,7 @@ function lovr.load()
 		-- Create audio geometry and visible form of a cube
 		multiply(rectangle[1], spaceSize)
 		if spaceFlip then flip(rectangle[2]) end
-		--lovr.audio.setGeometry(rectangle[1], rectangle[2], audioMaterial, geometryMode)
+		lovr.audio.setGeometry(rectangle[1], rectangle[2], audioMaterial, geometryMode)
 		
 		audioGeometryMesh =  lovr.graphics.newMesh(rectangle[1], 'triangles', 'dynamic', true)
   		audioGeometryMesh:setVertexMap(rectangle[2])
@@ -167,8 +167,8 @@ function lovr.load()
 		end
 
 		-- "Game system" sound effects are not spatialized
-		sounds.fail = lovr.audio.newSource("break-buzzer.ogg", {spatial=false})
-		sounds.restart = lovr.audio.newSource("break-countdown.ogg", {spatial=false})
+		sounds.fail = lovr.audio.newSource("break-buzzer.ogg", {effects=false})
+		sounds.restart = lovr.audio.newSource("break-countdown.ogg", {effects=false})
 		sounds.fail:setVolume(volume)   sounds.restart:setVolume(volume)
 	end
 end
