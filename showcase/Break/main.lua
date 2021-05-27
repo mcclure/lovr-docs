@@ -6,6 +6,7 @@ local DEBUG_backBumper = false -- Set this to "true" and the ball will bounce ba
 
 -- Configure spatializer test
 local spaceSize = 16
+local spaceFlip = false
 local audioMaterial = "concrete" -- Options include "carpet" "concrete" "glass"
 local geometryMode = "mesh" -- Options "disable" "box" "mesh". "box" is oculus-audio-only
 local volume = 1
@@ -120,10 +121,10 @@ local function multiply(vertices, n)
 	end
 end
 local function flip(indices) -- Flip mesh outward
-	for i=1,#mesh,3 do
-		local temp = mesh[i]
-		mesh[i] = mesh[i+2]
-		mesh[i+2] = temp
+	for i=1,#indices,3 do
+		local temp = indices[i]
+		indices[i] = indices[i+2]
+		indices[i+2] = temp
 	end
 end
 
@@ -131,7 +132,8 @@ local audioGeometryMesh
 
 function lovr.load()
 	print("Spatializer", lovr.audio.getSpatializer())
-	print("Material", audioMaterial, "Geometry", geometryMode, "Source-volume", volume)
+	print("Material", audioMaterial, "Geometry", geometryMode, "Geometry-size", spaceSize, spaceFlip and "(flipped)" or "")
+	print("Source-volume", volume)
 
 	lovr.graphics.setBackgroundColor(.1, .1, .1)
 	lovr.headset.setClipDistance(0.1, 3000)
@@ -144,6 +146,7 @@ function lovr.load()
 		--lovr.audio.setGeometry({0,0,0, 0,1,0, 1,0,0}, {1,2,3}) -- Alternate
 		-- Create audio geometry and visible form of a cube
 		multiply(rectangle[1], spaceSize)
+		if spaceFlip then flip(rectangle[2]) end
 		--lovr.audio.setGeometry(rectangle[1], rectangle[2], audioMaterial, geometryMode)
 		
 		audioGeometryMesh =  lovr.graphics.newMesh(rectangle[1], 'triangles', 'dynamic', true)
