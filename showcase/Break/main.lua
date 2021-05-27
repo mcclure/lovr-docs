@@ -5,8 +5,8 @@ local shader = require 'shader'
 local DEBUG_backBumper = false -- Set this to "true" and the ball will bounce back instead of dying
 
 -- Configure spatializer test
-local spaceSize = 16
-local spaceFlip = false
+local spaceSize = 16             -- Diameter of space
+local spaceFlip = false          -- If true reverse model winding
 local audioMaterial = "concrete" -- Options include "carpet" "concrete" "glass"
 local geometryMode = "mesh" -- Options "disable" "box" "mesh". "box" is oculus-audio-only
 local volume = 1
