@@ -1,14 +1,15 @@
 local Board = require 'board'
 local led = require 'led'
 local shader = require 'shader'
+local json = require 'cjson'
 
-local DEBUG_backBumper = false -- Set this to "true" and the ball will bounce back instead of dying
+local DEBUG_backBumper = true -- Set this to "true" and the ball will bounce back instead of dying
 
 -- Configure spatializer test
-local spaceSize = 16             -- Diameter of space
+local spaceSize = 8             -- Diameter of space
 local spaceFlip = false          -- If true reverse model winding
 local audioMaterial = "concrete" -- Options include "carpet" "concrete" "glass"
-local geometryMode = "mesh" -- Options "disable" "box" "mesh". "box" is oculus-audio-only
+local geometryMode = "box" -- Options "disable" "box" "mesh". "box" is oculus-audio-only
 local volume = 1
 
 -- Oculus Go uses a fixed camera position, so we have to change where things are drawn
@@ -169,7 +170,7 @@ function lovr.load()
 		-- "Game system" sound effects are not spatialized
 		sounds.fail = lovr.audio.newSource("break-buzzer.ogg", {effects=false})
 		sounds.restart = lovr.audio.newSource("break-countdown.ogg", {effects=false})
-		sounds.fail:setVolume(volume)   sounds.restart:setVolume(volume)
+		sounds.fail:setVolume(volume/10)   sounds.restart:setVolume(volume/10)
 	end
 end
 
@@ -264,9 +265,20 @@ end
 local function cheatDisarm() -- Whenever we hit a block we delete the table that constitutes "arming"
 	gameState.cheat = nil
 end
-
+local tim2 = 0
+local usePent = false
 function lovr.update(dt)
 	tim = tim + dt
+	tim2 = tim2 + dt
+	if tim2 > 100 then
+		usePent = not usePent
+		local model = usePent and rectangle or pentagon
+		local material = usePent and "glass" or "carpet"
+		local mode = usePent and "box" or "disable"
+		lovr.audio.setGeometry(model[1], model[2], material, mode)
+		tim2 = 0
+		print(usePent, material)
+	end
 
 	-- Use the highest-numbered hand, which is probably the right hand.
 	local controllerNames = lovr.headset.getHands()
